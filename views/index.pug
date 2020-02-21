@@ -1,0 +1,8 @@
+extends layout
+
+block content
+  h1= title
+  form(action="/submit" method="POST" enctype='multipart/form-data')
+    input#fileUpload(type="file" name="lpfile")
+
+    input(type="submit" value="Submit")
