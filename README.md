@@ -36,6 +36,8 @@ This project's dependencies are listed below:
 - [Node.js](https://github.com/nodejs/node)
 - [npm](https://github.com/npm/cli)
 - [nan](https://github.com/nodejs/nan)
+- [Open Solver Interface](https://github.com/coin-or/Osi)
+- [Clp](https://www.github.com/coin-or/Clp)
 - [Express](https://github.com/expressjs/express)
 - [pug](https://github.com/pugjs/pug)
 - [multer](https://github.com/expressjs/multer)
