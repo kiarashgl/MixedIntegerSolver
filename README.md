@@ -44,6 +44,7 @@ This project's dependencies are listed below:
 - debug
 - http-errors
 - morgan
+
 The last 4 dependencies are required by the Express framework.
-##Issues
-If you have had any problems about running the project or any other issues, feel free to mention it in the GitHub issues.
+## Issues
+If you have any problems about running the project or any other issues, feel free to mention it in the GitHub issues.

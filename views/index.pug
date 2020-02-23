@@ -2,7 +2,10 @@ extends layout
 
 block content
   h1= title
+  p= "Hello. You can solve a linear optimization problem by uploading an LP-File, and then you will get the result."
+  p= "This app uses the Open Solver Interface, which is an API to leverage some generic LP-solvers."
   form(action="/submit" method="POST" enctype='multipart/form-data')
-    input#fileUpload(type="file" name="lpfile")
-
+    label(for="lpfile")= "Upload your file here: "
+    input#fileUpload(type="file" name="lpfile" accept=".lp")
+    br
     input(type="submit" value="Submit")

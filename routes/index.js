@@ -1,8 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var Multer = require('multer');
-var upload = new Multer({dest: 'uploads/'});
-/* GET home page. */
+const storage = Multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, 'uploads/')
+  },
+  filename: function (req, file, callback) {
+    callback(null, file.originalname)
+  }
+});
+var upload = new Multer({storage: storage});
+var osi = require('bindings')('Osi.node');
+var path = require('path');
+
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Mixed Integer LP Solver' });
 });
@@ -10,6 +20,10 @@ router.get('/', function(req, res, next) {
 router.post('/submit', upload.single('lpfile'), (req, res) =>
 {
   console.log("Got a file!");
-  res.render('result', {title: "Thanks", message: "Got your file!"})
+  var file = path.join(global.appRoot, req.file.path);
+  console.log(req.file.filename);
+  
+  var output = osi.solve(file);
+  res.render('result', {title: "Upload Successful", message: "Your upload was successful!", result: output});
 })
 module.exports = router;
