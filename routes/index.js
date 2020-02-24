@@ -19,11 +19,9 @@ router.get('/', function(req, res, next) {
 
 router.post('/submit', upload.single('lpfile'), (req, res) =>
 {
-  console.log("Got a file!");
-  var file = path.join(global.appRoot, req.file.path);
-  console.log(req.file.filename);
+  const file = path.join(global.appRoot, req.file.path);
   
-  var output = osi.solve(file);
+  const output = osi.solve(file);
   res.render('result', {title: "Upload Successful", message: "Your upload was successful!", result: output});
 })
 module.exports = router;
