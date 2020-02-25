@@ -1,6 +1,6 @@
 # Web Service for Solving Mixed-Integer Programs
 This program is a web service that provides a solution for Linear Programming problems, using the [Open Solver Interface](https://github.com/coin-or/Osi) API.
-All you have to do is to run the service with *npm*, and then upload an [LP-File](https://www.coin-or.org/Doxygen/Osi/classCoinLpIO.html#details), and then the result is shown on the page.
+All you have to do is to run the service with [npm](https://github.com/npm/cli), and then upload an [LP-File](https://www.coin-or.org/Doxygen/Osi/classCoinLpIO.html#details), and then the result is shown on the page.
 This app is based on Node.js and Express.js, and the OSI framework is integrated as a plugin using [Native Abstractions for Node.js (NAN)](https://github.com/nodejs/nan).
 This project is currently supported on Linux.
 ## How to Install
