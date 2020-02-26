@@ -8,34 +8,34 @@ NAN_METHOD(solveLp)
     Isolate * isolate = info.GetIsolate();
     const std::string file_path(*v8::String::Utf8Value(isolate, info[0].As<String>()));
     std::stringstream sout;
-    OsiSolverInterface *solver = new OsiClpSolverInterface();
+    OsiClpSolverInterface solver;
 
    try
    {
-      solver->readLp(file_path.c_str());
-   
-      solver->initialSolve();
+      solver.readLp(file_path.c_str());
+      CbcModel model(solver);
+      model.branchAndBound();
 
-      if ( solver->isProvenOptimal() ) { 
+      if (model.isProvenOptimal() ) {
          sout << "Found optimal solution!" << std::endl; 
-         sout << "Objective value is " << solver->getObjValue() << std::endl;
+         sout << "Objective value is " << model.getObjValue() << std::endl;
 
-         int n = solver->getNumCols();
-         const double* solution = solver->getColSolution();
+         int n = model.getNumCols();
+         const double* solution = model.getColSolution();
 
          for( int i = 0; i < n; ++i )
-            sout << solver->getColName(i) << " = " << solution[i] << std::endl;
+            sout << solver.getColName(i) << " = " << solution[i] << std::endl;
       } else {
          sout << "Didn't find optimal solution." << std::endl;
-         if (solver->isProvenPrimalInfeasible())
+         if (model.solver()->isProvenPrimalInfeasible())
             sout << "Problem is proven to be infeasible." << std::endl;
-         if (solver->isProvenDualInfeasible())
+         if (model.solver()->isProvenDualInfeasible())
             sout << "Problem is proven dual infeasible." << std::endl;
-         if (solver->isPrimalObjectiveLimitReached())
+         if (model.solver()->isPrimalObjectiveLimitReached())
             sout << "Reached primal objective limit." << std::endl;
-         if (solver->isDualObjectiveLimitReached())
+         if (model.solver()->isDualObjectiveLimitReached())
             sout << "Reached dual objective limit." << std::endl;
-         if (solver->isIterationLimitReached())
+         if (model.solver()->isIterationLimitReached())
             sout << "Reached iteration limit." << std::endl;
       }
    }
