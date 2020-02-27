@@ -1,8 +1,5 @@
 #include "Osi.h"
 
-using namespace v8;
-using namespace Nan;
-
 NAN_METHOD(solveLp)
 {
     Isolate * isolate = info.GetIsolate();
@@ -14,6 +11,7 @@ NAN_METHOD(solveLp)
    {
       solver.readLp(file_path.c_str());
       CbcModel model(solver);
+      model.setKeepNamesPreproc(true);
       model.branchAndBound();
 
       if (model.isProvenOptimal() ) {
@@ -24,7 +22,7 @@ NAN_METHOD(solveLp)
          const double* solution = model.getColSolution();
 
          for( int i = 0; i < n; ++i )
-            sout << solver.getColName(i) << " = " << solution[i] << std::endl;
+            sout << model.solver()->getColName(i) << " = " << solution[i] << std::endl;
       } else {
          sout << "Didn't find optimal solution." << std::endl;
          if (model.solver()->isProvenPrimalInfeasible())

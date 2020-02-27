@@ -8,6 +8,8 @@
 #include <coin-or/CbcModel.hpp>
 #include <coin-or/CoinError.hpp>
 #include<nan.h>
+using namespace v8;
+using namespace Nan;
 
 NAN_METHOD(solveLp);
 
