@@ -1,5 +1,12 @@
 #include "Osi.h"
 
+#include<iostream>
+#include<sstream>
+#include<string>
+#include <coin-or/OsiClpSolverInterface.hpp>
+#include <coin-or/CbcModel.hpp>
+#include <coin-or/CoinError.hpp>
+
 using namespace v8;
 using namespace Nan;
 
@@ -39,7 +46,7 @@ NAN_METHOD(solveLp)
             sout << "Reached iteration limit." << std::endl;
       }
    }
-   catch(CoinError e)
+   catch(const CoinError& e)
    {
       sout << e.message() << std::endl;
    }
