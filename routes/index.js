@@ -20,8 +20,24 @@ router.get('/', function(req, res, next) {
 router.post('/submit', upload.single('lpfile'), (req, res) =>
 {
   const file = path.join(global.appRoot, req.file.path);
-  
-  const output = osi.solve(file);
-  res.render('result', {title: "Upload Successful", message: "Your upload was successful!", result: output});
+  var logStrings = [];
+  var progress = function(str)
+  {
+    logStrings.push(str.replace(/[^\x00-\x7F]/g, ""));
+    global.io.emit('logs', {log: logStrings.join('\n')});
+  }
+
+  var ret = function()
+  {
+    return logStrings;
+  }
+
+  var progress2 = function(str)
+  {
+    global.io.emit('answer', {ans: str});
+  }
+  osi.solve(file, progress, progress2);
+  res.render('result', {title: "Upload Successful", message: "Your upload was successful!"});
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
 })
 module.exports = router;
