@@ -6,36 +6,6 @@ OsiSolver::OsiSolver(std::string file_path)
 {
 }
 
-OsiWorker::OsiWorker(std::string file_path, Callback* progress, Callback* end_callback)
-: AsyncProgressQueueWorker(end_callback)
-, OsiSolver(file_path)
-, progress(progress)
-{
-}
-
-OsiWorker::~OsiWorker()
-{
-	delete progress;
-}
-
-void OsiWorker::Execute(const ExecutionProgress &progress)
-{
-	try
-	{
-		if (solver.readLp(file_path.c_str()) == -1)
-			throw CoinError("Unable to Read Lp File", "readLp", "OsiClpSolverInterface");
-		CbcModel model(solver);
-		MessageHandler message_handler(progress);
-		model.passInMessageHandler(&message_handler);
-		Run(model);
-	}
-	catch (const CoinError &e)
-	{
-		optimal = false;
-		progress.Send(reinterpret_cast<const char*>(e.message().c_str()), e.message().length());
-	}
-}
-
 void OsiSolver::Execute()
 {
 	try
@@ -93,26 +63,7 @@ void OsiSolver::Run(CbcModel& model)
 	}
 }
 
-void OsiWorker::HandleProgressCallback(const char *data, size_t count)
-{
-    Nan::HandleScope scope;
-    v8::Local<v8::Value> argv[] = {
-        Nan::New<String>(std::string(data)).ToLocalChecked()
-    };
-    progress->Call(1, argv, async_resource);
-}
-
-void OsiWorker::HandleOKCallback()
-{
-	Nan::HandleScope scope;
-
-	createSout();
-	v8::Local<v8::Value> argv[] = { Nan::New(sout.str()).ToLocalChecked(), Nan::New(getResultJson()).ToLocalChecked() };
-
-	callback->Call(2, argv, async_resource);
-}
-
-std::string OsiSolver::getResultJson() noexcept
+std::string OsiSolver::GetResultJson() noexcept
 {
 	std::string result = "{ ";
 	result += "\"response\": \"" + response + "\"";
@@ -133,6 +84,68 @@ std::string OsiSolver::getResultJson() noexcept
 	return result;
 }
 
+void OsiSolver::CreateSout() noexcept
+{
+	sout << response << std::endl;
+	if (optimal)
+	{
+		sout << "Objective value is " << objective_value << std::endl;
+		for (auto ans : answers)
+			sout << ans.first << " = " << ans.second << std::endl;
+	}
+		
+	sout.flush();
+}
+
+OsiWorker::OsiWorker(std::string file_path, Callback* progress, Callback* end_callback)
+: AsyncProgressQueueWorker(end_callback)
+, OsiSolver(file_path)
+, progress(progress)
+{
+}
+
+OsiWorker::~OsiWorker()
+{
+	delete progress;
+}
+
+void OsiWorker::Execute(const ExecutionProgress &progress)
+{
+	try
+	{
+		if (solver.readLp(file_path.c_str()) == -1)
+			throw CoinError("Unable to Read Lp File", "readLp", "OsiClpSolverInterface");
+		CbcModel model(solver);
+		MessageHandler message_handler(progress);
+		model.passInMessageHandler(&message_handler);
+		Run(model);
+	}
+	catch (const CoinError &e)
+	{
+		optimal = false;
+		progress.Send(reinterpret_cast<const char*>(e.message().c_str()), e.message().length());
+	}
+}
+
+void OsiWorker::HandleProgressCallback(const char *data, size_t count)
+{
+    Nan::HandleScope scope;
+    v8::Local<v8::Value> argv[] = {
+        Nan::New<String>(std::string(data)).ToLocalChecked()
+    };
+    progress->Call(1, argv, async_resource);
+}
+
+void OsiWorker::HandleOKCallback()
+{
+	Nan::HandleScope scope;
+
+	CreateSout();
+	v8::Local<v8::Value> argv[] = { Nan::New(sout.str()).ToLocalChecked(), Nan::New(GetResultJson()).ToLocalChecked() };
+
+	callback->Call(2, argv, async_resource);
+}
+
 OsiWorker::MessageHandler::MessageHandler(const AsyncProgressQueueWorker<char>::ExecutionProgress& progress)
 : progress(progress)
 {
@@ -145,19 +158,6 @@ int OsiWorker::MessageHandler::print()
 	usleep(100 * 1000);
 
 	return CoinMessageHandler::print();
-}
-
-void OsiSolver::createSout() noexcept
-{
-	sout << response << std::endl;
-	if (optimal)
-	{
-		sout << "Objective value is " << objective_value << std::endl;
-		for (auto ans : answers)
-			sout << ans.first << " = " << ans.second << std::endl;
-	}
-		
-	sout.flush();
 }
 
 NAN_METHOD(solveWeb)
@@ -176,6 +176,6 @@ NAN_METHOD(solveJson)
 	OsiSolver worker(std::move(file_path));
 	worker.Execute();
 
-	std::string result_json = worker.getResultJson();
+	std::string result_json = worker.GetResultJson();
 	info.GetReturnValue().Set(Nan::New(result_json.c_str()).ToLocalChecked());
 }

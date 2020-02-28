@@ -31,13 +31,18 @@ The web server would run on http://localhost:3000. You should upload a [.lp file
 ```bash
 sudo kill -9 `sudo lsof -t -i:3000`
 ```
+Also, you could send a `POST` request to the url http://localhost:3000/json containing the .lp file, to get the result as a `JSON` string. For example, if you want to solve an .lp file named `sampleFile.lp` in your current directory, simply run the following commands: (You may need to install curl.)
+```bash
+sudo apt install curl
+curl -F lpfile=@sampleFile.lp localhost:3000/json
+```
 ## Dependencies
 This project's dependencies are listed below:
 - [Node.js](https://github.com/nodejs/node)
 - [npm](https://github.com/npm/cli)
 - [nan](https://github.com/nodejs/nan)
 - [Open Solver Interface](https://github.com/coin-or/Osi)
-- [Clp](https://www.github.com/coin-or/Clp)
+- [Cbc](https://www.github.com/coin-or/Cbc)
 - [Express](https://github.com/expressjs/express)
 - [pug](https://github.com/pugjs/pug)
 - [multer](https://github.com/expressjs/multer)

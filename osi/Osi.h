@@ -17,14 +17,16 @@ using namespace Nan;
 class OsiSolver
 {
 public:
-    OsiSolver(std::string file_path);
+    explicit OsiSolver(std::string file_path);
+    OsiSolver() = delete;
 
     void Execute();
     void Run(CbcModel& model);
-    std::string getResultJson() noexcept;
-    void createSout() noexcept;
+    std::string GetResultJson() noexcept;
 
 protected:
+    void CreateSout() noexcept;
+
     std::stringstream sout;
 	OsiClpSolverInterface solver;
     const std::string file_path;
@@ -42,7 +44,6 @@ public:
     ~OsiWorker();
 
     void Execute(const ExecutionProgress& progress);
-    
     void HandleProgressCallback(const char* data, size_t count);
     void HandleOKCallback() override;
 
