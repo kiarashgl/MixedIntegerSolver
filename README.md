@@ -9,23 +9,17 @@ At first, install the latest version of Node.js; for example, if you want to ins
 curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
-For installing the dependencies for OSI, we need an installer tool named [CoinBrew](https://coin-or.github.io/coinbrew/). Download its script from [here](https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew).
+We use the [Cbc](https://www.github.com/coin-or/Cbc) solver with our interface. For installing the dependencies for Cbc and OSI, we need an installer tool named [CoinBrew](https://coin-or.github.io/coinbrew/). Download its script from [here](https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew).
 Then, run these commands: (`/path/to/coinbrew` should be changed to the path to the downloaded script. e.g. If it is in your current directory, the path would be `./coinbrew`)
-You may need to install liblapack or pkgconf.
+You may need to install liblapack, pkgconf or gfortran.
 ```bash
 chmod 777 /path/to/coinbrew
 sudo apt install liblapack-dev
 sudo apt install pkgconf
-/path/to/coinbrew fetch --main-proj=Osi
-sudo /path/to/coinbrew build --main-proj=Osi --prefix=/usr/local
-sudo /path/to/coinbrew install --main-proj=Osi
-```
-Also, we use the [Clp](https://www.github.com/coin-or/Clp) solver with our interface. To install it, again we use Coinbrew. (You may need to install gfortran.)
-```bash
 sudo apt install gfortran
-/path/to/coinbrew fetch Clp
-sudo /path/to/coinbrew build Clp --prefix=/usr/local
-sudo /path/to/coinbrew install Clp
+/path/to/coinbrew fetch Cbc
+sudo /path/to/coinbrew build Cbc --prefix=/usr/local
+sudo /path/to/coinbrew install cbc
 ```
 Finally, you could `cd` into the main directory of the project and run these commands to install the node dependencies and run the webserver:
 ```bash
@@ -47,7 +41,8 @@ This project's dependencies are listed below:
 - [Express](https://github.com/expressjs/express)
 - [pug](https://github.com/pugjs/pug)
 - [multer](https://github.com/expressjs/multer)
-- bindings
+- [Socket.io](https://github.com/socketio/socket.io)
+- [bindings](https://github.com/TooTallNate/node-bindings)
 - cookie-parser
 - debug
 - http-errors
