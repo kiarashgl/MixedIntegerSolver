@@ -6,6 +6,6 @@ block content
   p= "This app uses the Open Solver Interface, which is an API to leverage some generic LP-solvers."
   form(action="/submit" method="POST" enctype='multipart/form-data')
     label(for="lpfile")= "Upload your file here: "
-    input#fileUpload(type="file" name="lpfile" accept=".lp")
+    input#fileUpload(required type="file" name="lpfile" accept=".lp")
     br
     input(type="submit" value="Submit")

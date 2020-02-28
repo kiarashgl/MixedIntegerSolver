@@ -14,13 +14,35 @@
 using namespace v8;
 using namespace Nan;
 
-class OsiWorker : public AsyncProgressQueueWorker<char>
+class OsiSolver
+{
+public:
+    OsiSolver(std::string file_path);
+
+    void Execute();
+    void Run(CbcModel& model);
+    std::string getResultJson() noexcept;
+    void createSout() noexcept;
+
+protected:
+    std::stringstream sout;
+	OsiClpSolverInterface solver;
+    const std::string file_path;
+    bool optimal;
+    std::string response;
+    double objective_value;
+    std::vector<std::pair<std::string, double>> answers;
+};
+
+class OsiWorker : public AsyncProgressQueueWorker<char>, public OsiSolver
 {
 public:
     OsiWorker(std::string file_path, Callback* progress, Callback* end_callback);
+    OsiWorker() = delete;
     ~OsiWorker();
 
     void Execute(const ExecutionProgress& progress);
+    
     void HandleProgressCallback(const char* data, size_t count);
     void HandleOKCallback() override;
 
@@ -36,12 +58,10 @@ private:
         const AsyncProgressQueueWorker<char>::ExecutionProgress& progress;
     };
 
-    std::stringstream sout;
-	OsiClpSolverInterface solver;
-    std::string file_path;
     Nan::Callback* progress;
 };
 
-NAN_METHOD(solveLp);
+NAN_METHOD(solveWeb);
+NAN_METHOD(solveJson);
 
 #endif

@@ -10,9 +10,16 @@ html(lang="en")
   script(type='text/javascript' src='/javascripts/socket.io.js')
   script. 
     var socket = io();
+    var json = "";
+    showJson = function()
+    {
+      document.getElementById("json").innerHTML = json;
+    }
     socket.on('logs', function(data) {
         document.getElementById("log").innerHTML = data.log;
       });
     socket.on('answer', function(data) {
         document.getElementById("ans").innerHTML = data.ans;
+        json = data.json;
+        document.getElementById("jsonButton").style.visibility = "visible";
       });

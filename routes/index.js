@@ -19,25 +19,41 @@ router.get('/', function(req, res, next) {
 
 router.post('/submit', upload.single('lpfile'), (req, res) =>
 {
-  const file = path.join(global.appRoot, req.file.path);
-  var logStrings = [];
-  var progress = function(str)
+  if (!req.file || req.file === "")
+    res.end("Error: No file uploaded.\n")
+  else
   {
-    logStrings.push(str.replace(/[^\x00-\x7F]/g, ""));
-    global.io.emit('logs', {log: logStrings.join('\n')});
+    const file = path.join(global.appRoot, req.file.path);
+    var logStrings = [];
+    var sendLogs = function()
+    {
+      global.io.emit('logs', {log: logStrings.join('\n')});
+    }
+    var progress = function(str)
+    {
+      logStrings.push(str.replace(/[^\x00-\x7F]/g, ""));
+      sendLogs();
+    }
+    var answer = function(ans, json)
+    {
+      global.io.emit('answer', {ans: ans, json: json});
+    }
+    osi.solve(file, progress, answer);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.render('result', {title: "Upload Successful", message: "Your upload was successful!"});
+    setTimeout(sendLogs, 1000);
   }
+});
 
-  var ret = function()
+router.post('/json', upload.single('lpfile'), (req, res) =>
+{
+  if (!req.file || req.file === "")
+    res.end("Error: No file uploaded.\n")
+  else
   {
-    return logStrings;
+    const file = path.join(global.appRoot, req.file.path);
+    var myJson = osi.solveJson(file);
+    res.json(JSON.parse(myJson));
   }
-
-  var progress2 = function(str)
-  {
-    global.io.emit('answer', {ans: str});
-  }
-  osi.solve(file, progress, progress2);
-  res.render('result', {title: "Upload Successful", message: "Your upload was successful!"});
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
 })
 module.exports = router;
